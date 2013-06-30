@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<configuration>
+    <appSettings>        
+        <add key="serverType" value="SqlServer2012"/><!-- valid ServerType values are: SqlServer2008 SqlServer2011 MySql6 PostGres90 SqlLite -->
+        <add key="providerName" value="System.Data.SqlClient"/><!-- valid ServerType values are: System.Data.SqlClient -->
+        <add key="connectionString" value= "Server=PC-AREGS7\LOCAL;Database=Master;Trusted_Connection=True;"/>
+        <add key="databaseName" value="Autos"/>
+        <add key="migrationClassPath" value="C:\MvcProjects\Autos\Autos\Migrations"/>
+        <add key="migrationScriptPath" value="C:\MvcProjects\Autos\Autos\Sql"/>
+        <add key="migrationLibraryAssemblyPath" value="C:\MvcProjects\Autos\Autos\Libs\Migrations.dll"/>
+    </appSettings>
+    <startup><supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.0"/></startup>
+</configuration>

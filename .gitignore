@@ -1,0 +1,7 @@
+Migrations/[Dd]ebug/
+Migrations/[Rr]elease/
+Migrations/[Bb]in/
+Migrations/[Oo]bj/
+Migrations/*.user
+*.suo
+*.sln.cache

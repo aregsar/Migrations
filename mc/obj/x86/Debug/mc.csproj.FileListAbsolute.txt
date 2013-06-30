@@ -1,0 +1,16 @@
+C:\MvcProjects\Migrations\mc\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\MvcProjects\Migrations\mc\bin\Debug\mc.exe.config
+C:\MvcProjects\Migrations\mc\bin\Debug\mc.exe
+C:\MvcProjects\Migrations\mc\bin\Debug\mc.pdb
+C:\MvcProjects\Migrations\mc\bin\Debug\Migrations.dll
+C:\MvcProjects\Migrations\mc\bin\Debug\Migrations.pdb
+C:\MvcProjects\Migrations\mc\obj\x86\Debug\mc.exe
+C:\MvcProjects\Migrations\mc\obj\x86\Debug\mc.pdb
+C:\Projects\ideas\Migrations\mc\bin\Debug\mc.exe.config
+C:\Projects\ideas\Migrations\mc\obj\x86\Debug\mc.exe
+C:\Projects\ideas\Migrations\mc\obj\x86\Debug\mc.pdb
+C:\Projects\ideas\Migrations\mc\bin\Debug\mc.exe
+C:\Projects\ideas\Migrations\mc\bin\Debug\mc.pdb
+C:\Projects\ideas\Migrations\mc\bin\Debug\Migrations.dll
+C:\Projects\ideas\Migrations\mc\bin\Debug\Migrations.pdb
+C:\Projects\ideas\Migrations\mc\obj\x86\Debug\mc.csprojResolveAssemblyReference.cache

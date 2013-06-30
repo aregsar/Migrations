@@ -1,0 +1,36 @@
+﻿
+Project setup Instructions:
+
+1-Set the path of the Migration Console2 application to the Consolue2 directory location
+2-Add a migrations folder to a VS project (or use your own name)
+3-Add a Sql folder to the VS project (or use your own name)
+4-Add a Libs folder to the VS project (or use your own name)
+5-Drop the Migrations.dll file into the Libs directory
+5-Add a reference to the Migrations.dll file in the project that contains the migrations folder(alternatively you can reference the same dll in the Console2 folder and remove the Libs folder)
+6-In the mc.exe.config file  in the Console2 directory as needed: 
+
+a-set the migrationLibraryAssemblyPath key value to the path for of the Migrations.dll file in the Libs folder
+b-set the migrationClassPath key value to the path for of the Migrations folder (note: if you use a different name for the folder, reflect that here)
+c-set the migrationScriptPath key value to the path for of the Sql folder (note: if you use a different name for the folder, reflect that here)
+d-Set the databaseName key value to the database that will be the target of the migrations. This could be a preexisting database or a new one that will be created via the console.
+e-Set the connectionString key value to a connection string for the database server. Be sure to Leave the Database name specified in the connection string as "Master".
+f-set the providerName to the appropriate .net sql server provider name for your database server.
+g-set the serverType to the database server type that you will be using. Current supported types are SqlServe2012 and SqlServer2008
+
+
+
+
+
+
+
+exampleof mc.exe.config key/values are listed below:
+
+<add key="serverType" value="SqlServer2012"/><!-- valid ServerType values are: SqlServer2008 SqlServer2011 MySql6 PostGres90 SqlLite -->
+<add key="providerName" value="System.Data.SqlClient"/><!-- valid ServerType values are: System.Data.SqlClient -->
+<add key="connectionString" value= "Server=PC-AREGS7\LOCAL;Database=Master;Trusted_Connection=True;"/>
+<add key="databaseName" value="Autos"/>
+<add key="migrationClassPath" value="C:\MvcProjects\Autos\Autos\Migrations"/>
+<add key="migrationScriptPath" value="C:\MvcProjects\Autos\Autos\Sql"/>
+<add key="migrationLibraryAssemblyPath" value="C:\MvcProjects\Autos\Autos\Libs\Migrations.dll"/>
+
+To use an alternate config in the Configs subfolder, rename from <database>.mc.exe.config to mc.exe.config and drop in the parent directory ovewriting the existig one)
