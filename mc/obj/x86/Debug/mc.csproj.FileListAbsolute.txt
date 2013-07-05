@@ -14,3 +14,11 @@ C:\Projects\ideas\Migrations\mc\bin\Debug\mc.pdb
 C:\Projects\ideas\Migrations\mc\bin\Debug\Migrations.dll
 C:\Projects\ideas\Migrations\mc\bin\Debug\Migrations.pdb
 C:\Projects\ideas\Migrations\mc\obj\x86\Debug\mc.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Documents\GitHub\Migrations\mc\bin\Debug\mc.exe.config
+C:\Users\Administrator\Documents\GitHub\Migrations\mc\bin\Debug\mc.exe
+C:\Users\Administrator\Documents\GitHub\Migrations\mc\bin\Debug\mc.pdb
+C:\Users\Administrator\Documents\GitHub\Migrations\mc\bin\Debug\Migrations.dll
+C:\Users\Administrator\Documents\GitHub\Migrations\mc\bin\Debug\Migrations.pdb
+C:\Users\Administrator\Documents\GitHub\Migrations\mc\obj\x86\Debug\mc.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Documents\GitHub\Migrations\mc\obj\x86\Debug\mc.exe
+C:\Users\Administrator\Documents\GitHub\Migrations\mc\obj\x86\Debug\mc.pdb

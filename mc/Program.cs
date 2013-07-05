@@ -14,6 +14,12 @@ namespace mc
             try
             {
 
+                if (args.Length > 0)
+                {
+                    ProcessCommandLineArguments(args[0].Trim());
+                    return;
+                }
+
                 Console.WriteLine(">type help for available commands. type exit to exit console.");
 
                 //Console.WriteLine(new MigrationCommands().ProcessCommand("version"));
@@ -48,6 +54,11 @@ namespace mc
                 Console.WriteLine("Press a key to shut down the program");
                 Console.ReadLine();
             }
+        }
+
+        static void ProcessCommandLineArguments(string version)
+        {
+            new MigrationCommands().ProcessCommand("migrate to " + version);      
         }
 
 

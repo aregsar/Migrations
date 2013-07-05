@@ -15,6 +15,7 @@ namespace Migrations.Schemas
         public string Short { get { return "smallint"; } }
         public string Guid { get { return "uniqueidentifier"; } }
         public string DateTime { get { return "datetime"; } }
+        public string DateTime2 { get { return "datetime2(7)"; } }
 
     }
 
