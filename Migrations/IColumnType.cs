@@ -15,6 +15,7 @@ namespace Migrations
         string Short { get; }
         string Guid { get; }
         string DateTime { get; }
+        string DateTime2 { get; }
 
     }
 
