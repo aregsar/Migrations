@@ -2,50 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Migrations;
+using mc.Commands;
 
 namespace mc
 {
     class Program
     {
+        private static Dictionary<string, IDatabaseCommand> Commands = new Dictionary<string, IDatabaseCommand>();
+
         static void Main(string[] args)
         {
-
             try
             {
+                LoadCommands();
 
                 if (args.Length > 0)
                 {
-                    ProcessCommandLineArguments(args[0].Trim());
-                    return;
+                    ProcessCommandLineArguments(args);
                 }
-
-                Console.WriteLine(">type help for available commands. type exit to exit console.");
-
-                //Console.WriteLine(new MigrationCommands().ProcessCommand("version"));
-
-                while (true)
+                else
                 {
-                    Console.Write(">");
-
-                    string input = Console.ReadLine().Trim().ToLower();
-
-                    if (input.Trim().StartsWith("exit")) break;
-
-                    if (input != String.Empty)
-                    {
-                        if (input == "v") input = "version";
-                        Console.WriteLine(new MigrationCommands().ProcessCommand(input));
-                    }
-
-                    //if (input == String.Empty)
-                    //{
-                    //    Console.WriteLine(new MigrationCommands().ProcessCommand("version"));
-                    //}
-                    //else
-                    //{
-                    //    Console.WriteLine(new MigrationCommands().ProcessCommand(input));
-                    //}
+                    StartCommandProcessingLoop();                 
                 }
             }
             catch (Exception ex)
@@ -55,12 +34,63 @@ namespace mc
                 Console.ReadLine();
             }
         }
-
-        static void ProcessCommandLineArguments(string version)
+        
+        private static void LoadCommands()
         {
-            new MigrationCommands().ProcessCommand("migrate to " + version);      
+            Commands.Add("commands", new CommandsCommand());
+
+            Commands.Add("setup", new SetupCommand());
         }
 
+        private static void StartCommandProcessingLoop()
+        {
+            Console.WriteLine(">type help for available commands. type exit to exit console.");
+
+            while (true)
+            {
+                Console.Write(">");
+
+                string input = Console.ReadLine().Trim().ToLower();
+
+                if (input.Trim().StartsWith("exit")) break;
+
+                if (input != String.Empty)
+                {
+                    if (input == "v") input = "version";
+
+                    Console.WriteLine(new MigrationCommands().ProcessCommand(input));
+                }
+            }
+        }
+
+      
+
+
+        private static void ProcessCommandLineArguments(string[] args)
+        {
+            //new MigrationCommands().ProcessCommand("migrate to " + version);    
+            //mc.exe args
+            //mc.exe setup catapult
+            //mc.exe migrate catapult
+            //mc.exe migrate catapult all
+            //mc.exe migrate catapult 1
+
+            //mc.exe migrate catapult
+            //mc.exe migrate catapult all
+
+          
+            string command = args[0];
+
+            IDatabaseCommand c  = Commands[command];
+
+            c.Process(args);
+ 
+        }
+
+        
+
+
+ 
 
     }
 }

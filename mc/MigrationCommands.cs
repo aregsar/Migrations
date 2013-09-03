@@ -32,7 +32,7 @@ namespace mc
 
             if (commandString.StartsWith("help")) return ProcessHelpCommand();
 
-            if (commandString.StartsWith("version")) return ProcessVersionCommand();
+            if (commandString.StartsWith("version")) return ProcessVersionCommand(MigrationConfiguration.ConnectionString);
 
             if (commandString.StartsWith("migrate")) return ProcessMigrateCommand(RemoveFromStartAndTrim("migrate", commandString));
 
@@ -116,9 +116,9 @@ namespace mc
 
         private string ProcessCreateCommand(string commandString)
         {
-            if (commandString.StartsWith("database")) return ProcessCreateDatabaseCommand();
+            if (commandString.StartsWith("database")) return ProcessCreateDatabaseCommand(MigrationConfiguration.DatabaseName, MigrationConfiguration.MasterConnectionString);
 
-            if (commandString.StartsWith("schema")) return ProcessCreateSchemaCommand();
+            if (commandString.StartsWith("schema")) return ProcessCreateSchemaCommand(MigrationConfiguration.ConnectionString);
 
             if (commandString.StartsWith("migration")) return ProcessCreateMigrationCommand(RemoveFromStartAndTrim("migration", commandString));
 
@@ -162,7 +162,9 @@ namespace mc
 
             if (commandString.StartsWith("down")) return ProcessMigrateDownCommand(RemoveFromStartAndTrim("down", commandString));
 
-            if (commandString.StartsWith("to")) return ProcessMigrateToCommand(RemoveFromStartAndTrim("to", commandString));
+            //if (commandString.StartsWith("to")) return ProcessMigrateToCommand(RemoveFromStartAndTrim("to", commandString));
+            string version = RemoveFromStartAndTrim("to", commandString);
+            if (commandString.StartsWith("to")) return ProcessMigrateTo(MigrationConfiguration.ConnectionString,RemoveFromStartAndTrim("to", version));
 
             return "command not available";
         }
@@ -175,9 +177,9 @@ namespace mc
             commandString = commandString.Trim();
 
             if (commandString == "all")
-                return ProcessMigrateDownAllCommand();
+                return ProcessMigrateDownAllCommand(MigrationConfiguration.ConnectionString);
             else
-                return ProcessMigrateDownCommand();
+                return ProcessMigrateDown(MigrationConfiguration.ConnectionString);
         }
 
       
@@ -187,27 +189,30 @@ namespace mc
             commandString = commandString.Trim();
 
             if (commandString == "all")
-                return ProcessMigrateUpAllCommand();
+                return ProcessMigrateUpAllCommand(MigrationConfiguration.ConnectionString);
             else
-                return ProcessMigrateUpCommand();
+                return ProcessMigrateUp(MigrationConfiguration.ConnectionString);
         }
 
 
 
-    
+        public string ProcessCreateDatabaseAndSchemaCommand(string databaseName, string connectionString, string masterConnectionString)
+        {
+            ProcessCreateDatabaseCommand(databaseName, masterConnectionString);
+            ProcessCreateSchemaCommand(connectionString);
+            return "command executed";
+
+        }
+
+      
 
 
-
-
-
-
-
-        private string ProcessCreateDatabaseCommand()
+        private string ProcessCreateDatabaseCommand(string databaseName, string masterConnectionString)
         {
             try
             {
-                SqlScriptExecuter.CreateDatabase(MigrationConfiguration.DatabaseName, MigrationConfiguration.MasterConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
-
+                //SqlScriptExecuter.CreateDatabase(MigrationConfiguration.DatabaseName, MigrationConfiguration.MasterConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                SqlScriptExecuter.CreateDatabase(databaseName, masterConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
                 return "command executed";
             }
             catch (Exception ex)
@@ -216,11 +221,11 @@ namespace mc
             }
         }
 
-        private string ProcessCreateSchemaCommand()
+        private string ProcessCreateSchemaCommand(string connectionString)
         {
             try
             {
-                string result = SqlScriptExecuter.CreateSchemaVersionTable(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                string result = SqlScriptExecuter.CreateSchemaVersionTable(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
 
                 return result;
             }
@@ -230,11 +235,11 @@ namespace mc
             }
         }
 
-        private string ProcessVersionCommand()
+        private string ProcessVersionCommand(string connectionString)
         {
             try
             {
-                return SqlScriptExecuter.GetSchemaVersion(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                return SqlScriptExecuter.GetSchemaVersion(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
             }
             catch(Exception ex)
             {
@@ -397,13 +402,13 @@ namespace mc
         }
 
 
-        private string ProcessMigrateUpCommand()
+        private string ProcessMigrateUp(string connectionString)
         {
             try
             {
                 string script = "";
 
-                string currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                string currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
 
                 string nextVersion = GetNextVersion(currentVersionFromDatabase, MigrationConfiguration.migrationClassPath);
 
@@ -461,14 +466,14 @@ namespace mc
             }     
         }
 
-        private string ProcessMigrateDownCommand()
+        private string ProcessMigrateDown(string connectionString)
         {
             try
             {
 
                 string script = "";
 
-                string currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                string currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
 
                 if (currentVersionFromDatabase != "00000000000000")
                 {
@@ -525,13 +530,13 @@ namespace mc
             }    
         }
 
-        private string ProcessMigrateUpAllCommand()
+        private string ProcessMigrateUpAllCommand(string connectionString)
         {
-            string accscript = ProcessMigrateUpCommand();
+            string accscript = ProcessMigrateUp(connectionString);
             string script = accscript;
             while (!accscript.StartsWith("Error:") && !accscript.StartsWith("Done:"))
             {
-                accscript = ProcessMigrateUpCommand();
+                accscript = ProcessMigrateUp(connectionString);
 
                 script = script + Environment.NewLine + accscript;
             }
@@ -540,13 +545,13 @@ namespace mc
 
       
 
-        private string ProcessMigrateDownAllCommand()
+        private string ProcessMigrateDownAllCommand(string connectionString)
         {
-            string accscript = ProcessMigrateDownCommand();
+            string accscript = ProcessMigrateDown(connectionString);
             string script = accscript;
             while (!accscript.StartsWith("Error:") && !accscript.StartsWith("Done:"))
             {
-                accscript = ProcessMigrateDownCommand();
+                accscript = ProcessMigrateDown(connectionString);
 
                 script = script + Environment.NewLine + accscript;          
             }
@@ -554,7 +559,7 @@ namespace mc
         }
 
 
-        private string ProcessMigrateToCommand(string version)
+        private string ProcessMigrateTo(string connectionString,string version)
         {
 
             try
@@ -571,7 +576,7 @@ namespace mc
                     {
                         if (version == "00000000000000")
                         {
-                            return ProcessMigrateDownAllCommand();
+                            return ProcessMigrateDownAllCommand(connectionString);
                         }
                         else
                         {
@@ -581,11 +586,11 @@ namespace mc
                             {
                                 if (long.Parse(currentVersionFromDatabase) < long.Parse(version))
                                 {
-                                    return ProcessMigrateUpToCommand(currentVersionFromDatabase, version);
+                                    return ProcessMigrateUpTo(connectionString,currentVersionFromDatabase, version);
                                 }
                                 else
                                 {
-                                    return ProcessMigrateDownToCommand(currentVersionFromDatabase, version);
+                                    return ProcessMigrateDownTo(connectionString,currentVersionFromDatabase, version);
                                 }
                             }
                         }
@@ -606,32 +611,32 @@ namespace mc
 
 
 
-        private string ProcessMigrateUpToCommand(string currentVersionFromDatabase, string version)
+        private string ProcessMigrateUpTo(string connectionString, string currentVersionFromDatabase, string version)
         {
             string accscript = "";
             string script = "";
             while (long.Parse(currentVersionFromDatabase) < long.Parse(version))
             {
-                accscript = ProcessMigrateUpCommand();
+                accscript = ProcessMigrateUp(connectionString);
 
                 script = script + Environment.NewLine + accscript;
 
-                currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
             }
             return script;
         }
 
-        private string ProcessMigrateDownToCommand(string currentVersionFromDatabase, string version)
+        private string ProcessMigrateDownTo(string connectionString, string currentVersionFromDatabase, string version)
         {
             string accscript = "";
             string script = "";
             while (long.Parse(currentVersionFromDatabase) > long.Parse(version))
             {
-                accscript = ProcessMigrateDownCommand();
+                accscript = ProcessMigrateDown(connectionString);
 
                 script = script + Environment.NewLine + accscript;
 
-                currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
 
             }
             return script;

@@ -44,6 +44,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\BackupCommand.cs" />
+    <Compile Include="Commands\CommandsCommand.cs" />
+    <Compile Include="Commands\CreateCommand.cs" />
+    <Compile Include="Commands\DownloadBackupCommand.cs" />
+    <Compile Include="Commands\DropCommand.cs" />
+    <Compile Include="Commands\MigrateCommand.cs" />
+    <Compile Include="Commands\RestoreCommand.cs" />
+    <Compile Include="Commands\RollbackCommand.cs" />
+    <Compile Include="Commands\ScriptCommand.cs" />
+    <Compile Include="Commands\SetupCommand.cs" />
+    <Compile Include="Commands\TruncateCommand.cs" />
+    <Compile Include="Commands\UploadBackupCommand.cs" />
+    <Compile Include="Commands\VersionCommand.cs" />
+    <Compile Include="DatabaseCommand.cs" />
+    <Compile Include="IDatabaseCommand.cs" />
     <Compile Include="MigrationCommands.cs" />
     <Compile Include="MigrationConfiguration.cs" />
     <Compile Include="Program.cs" />
