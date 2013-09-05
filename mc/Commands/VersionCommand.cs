@@ -22,6 +22,7 @@ namespace mc.Commands
                 string version = args[2];
 
                 string result = new MigrationCommands().ProcessMigrateTo(connectionString, version);
+                Console.WriteLine(result);
                 
             }
             else if (args.Length == 2)

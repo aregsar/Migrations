@@ -64,6 +64,8 @@
     <Compile Include="IDatabaseCommand.cs" />
     <Compile Include="MigrationCommands.cs" />
     <Compile Include="MigrationConfiguration.cs" />
+    <Compile Include="Migrations\20130902201813_test.cs" />
+    <Compile Include="Migrations\20130905130642_test_table_two.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -78,10 +80,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Database\" />
-    <Folder Include="Migrations\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
