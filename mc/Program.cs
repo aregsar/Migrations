@@ -81,7 +81,7 @@ namespace mc
         {
           
           
-            string command = args[0];
+            string command = args[1];
 
             IDatabaseCommand c  = Commands[command];
 
@@ -114,6 +114,37 @@ namespace mc
 
             pars = new string[] { "script"};
             new ScriptCommand().Process(pars);
+
+        }
+
+        private static void RunTests2(string database)
+        {
+            string[] pars = new string[] { database, "version" };
+            new VersionCommand().Process(pars);
+
+            pars = new string[] { database, "update" };
+            new MigrateCommand().Process(pars);
+
+            pars = new string[] { database, "rollback" };
+            new RollbackCommand().Process(pars);
+
+            pars = new string[] { database, "update", "all" };
+            new MigrateCommand().Process(pars);
+
+            pars = new string[] { database, "rollback", "all" };
+            new RollbackCommand().Process(pars);
+
+            pars = new string[] { database, "version", "20130903112233" };
+            new VersionCommand().Process(pars);
+
+            pars = new string[] { database, "version", "0" };
+            new VersionCommand().Process(pars);
+
+            pars = new string[] { database, "script" };
+            new ScriptCommand().Process(pars);
+
+            //pars = new string[] { database, "print" };
+            //new ScriptCommand().Process(pars);
 
         }
 

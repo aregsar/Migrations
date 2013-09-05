@@ -12,7 +12,7 @@ namespace mc.Commands
 
         public void Process(string[] args)
         {
-            string databaseName = args[1];
+            string databaseName = args[0];
 
             string connectionString = MigrationConfiguration.ConnectionStringFor(databaseName);
 

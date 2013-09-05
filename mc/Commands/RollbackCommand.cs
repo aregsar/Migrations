@@ -13,7 +13,7 @@ namespace mc.Commands
 
         public void Process(string[] args)
         {
-            string databaseName = args[1];
+            string databaseName = args[0];
 
             string connectionString = MigrationConfiguration.ConnectionStringFor(databaseName);
 
@@ -23,7 +23,7 @@ namespace mc.Commands
                 Console.WriteLine(result);
 
             }
-            if (args.Length == 2)
+            else if (args.Length == 2)
             {
                 string result = new MigrationCommands().ProcessMigrateDown(connectionString);
                 Console.WriteLine(result);

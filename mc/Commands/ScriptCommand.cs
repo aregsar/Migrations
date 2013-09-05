@@ -12,10 +12,12 @@ namespace mc.Commands
 
         public void Process(string[] args)
         {
+            string databaseName = args[0];
+
             // MigrationFactory.GetMigrationFilePaths(MigrationConfiguration.migrationClassPath);
-            string result = new MigrationCommands().ProcessScriptAllCommand();
+            string result = new MigrationCommands().ProcessScriptAllCommand(databaseName);
           
-            Console.WriteLine("generated all migration scripts in directory " + MigrationConfiguration.migrationScriptPath);
+            Console.WriteLine("generated all migration scripts in directory " + MigrationConfiguration.migrationScriptPath + "\\" + databaseName);
             Console.WriteLine("From migration Source files at " + MigrationConfiguration.migrationClassPath);
      
 

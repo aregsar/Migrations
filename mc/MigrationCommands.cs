@@ -133,8 +133,8 @@ namespace mc
         private string ProcessScriptCommand(string commandString)
         {
             if (commandString.Trim() == "") return "must specify a version or 'all'";
-  
-            if (commandString.StartsWith("all")) return ProcessScriptAllCommand();
+
+            if (commandString.StartsWith("all")) return ProcessScriptAllCommand(MigrationConfiguration.DatabaseName);
 
             if (IsVerionTimestamp(commandString)) 
                 return ProcessScriptVerionCommand(commandString.Trim());
@@ -302,7 +302,7 @@ namespace mc
             }
         }
 
-        public string ProcessScriptAllCommand()
+        public string ProcessScriptAllCommand(string databaseName)
         {
             try
             {
@@ -317,7 +317,18 @@ namespace mc
 
                     string version = MigrationFactory.GetVersionFromMigrationFilePath(migrationFilePath);
                     string[] parts = migrationFilePath.Split('\\');
-                    string scriptFilePath = Path.Combine(MigrationConfiguration.migrationScriptPath, parts[parts.Length - 1]).Replace(".cs", ".sql");
+                    //string scriptFilePath = Path.Combine(MigrationConfiguration.migrationScriptPath, parts[parts.Length - 1]).Replace(".cs", ".sql");
+
+
+                    string migrationScriptsDirectory = Path.Combine(MigrationConfiguration.migrationScriptPath , databaseName);
+
+                    if (!Directory.Exists(migrationScriptsDirectory))
+                    {
+                        Directory.CreateDirectory(migrationScriptsDirectory);
+                    }
+                    string filePath = Path.Combine(migrationScriptsDirectory, parts[parts.Length - 1]);
+
+                    string scriptFilePath = filePath.Replace(".cs", ".sql");
 
                     script = script + "Generate change script version: " + version + Environment.NewLine + migration.UpScript(scriptFilePath, version);
                     script = script + Environment.NewLine + "Generate rollback script version: " + version + Environment.NewLine + migration.DownScript(scriptFilePath, version) + Environment.NewLine;
@@ -673,13 +684,14 @@ namespace mc
 
         string GetNextVersion(string version, string migrationClassFileDirectory)
         {
+
             SortedList list = MigrationFactory.GetSortedMigrationFileVersionsFromMigrationFiles(migrationClassFileDirectory);
 
             int index = list.IndexOfKey(version);
 
             string nextversion = null;
 
-            if (index == -1)
+            if (index == -1 && version != "00000000000000")
             {
                 return string.Empty;
             }
