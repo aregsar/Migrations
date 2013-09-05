@@ -35,7 +35,7 @@ namespace Migrations
 
          void BeginTransaction(); 
    
-         void CommitTransaction();
+         void CommitTransaction(string versionUpdate = null);
 
          //Script("update tbla set  abcd = 0");
          void Script(string script);

@@ -16,7 +16,7 @@ namespace mc.Commands
                                
                 string databaseName = args[1];
 
-                string connectionString = MigrationConfiguration.MasterConnectionString.Replace("Master",databaseName);
+                string connectionString = MigrationConfiguration.ConnectionStringFor(databaseName);
 
                 string result = new MigrationCommands().ProcessCreateDatabaseAndSchemaCommand(databaseName, connectionString, MigrationConfiguration.MasterConnectionString);
 

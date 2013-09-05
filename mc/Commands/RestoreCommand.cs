@@ -11,6 +11,10 @@ namespace mc.Commands
 
         public void Process(string[] args)
         {
+            string databaseName = args[1];
+
+            string connectionString = MigrationConfiguration.ConnectionStringFor(databaseName);
+
 
             Console.WriteLine(SetupCommand.CommandSyntax);
 

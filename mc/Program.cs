@@ -18,6 +18,8 @@ namespace mc
             {
                 LoadCommands();
 
+                //RunTests("migration");//TEMP
+
                 if (args.Length > 0)
                 {
                     ProcessCommandLineArguments(args);
@@ -40,6 +42,15 @@ namespace mc
             Commands.Add("commands", new CommandsCommand());
 
             Commands.Add("setup", new SetupCommand());
+
+            Commands.Add("update", new MigrateCommand());
+
+            Commands.Add("rollback", new RollbackCommand());
+
+            Commands.Add("script", new ScriptCommand());
+
+            Commands.Add("version", new VersionCommand());
+
         }
 
         private static void StartCommandProcessingLoop()
@@ -68,16 +79,7 @@ namespace mc
 
         private static void ProcessCommandLineArguments(string[] args)
         {
-            //new MigrationCommands().ProcessCommand("migrate to " + version);    
-            //mc.exe args
-            //mc.exe setup catapult
-            //mc.exe migrate catapult
-            //mc.exe migrate catapult all
-            //mc.exe migrate catapult 1
-
-            //mc.exe migrate catapult
-            //mc.exe migrate catapult all
-
+          
           
             string command = args[0];
 
@@ -87,7 +89,33 @@ namespace mc
  
         }
 
-        
+        private static void RunTests(string database)
+        {
+            string[] pars = new string[] { "version", database };
+            new VersionCommand().Process(pars);
+
+            pars = new string[] { "update", database };
+            new MigrateCommand().Process(pars);
+
+            pars = new string[] { "rollback", database };
+            new RollbackCommand().Process(pars);
+
+            pars = new string[] { "update", database , "all" };
+            new MigrateCommand().Process(pars);
+
+            pars = new string[] { "rollback", database, "all" };
+            new RollbackCommand().Process(pars);
+
+            pars = new string[] { "version", database, "20130903112233" };
+            new VersionCommand().Process(pars);
+
+            pars = new string[] { "version", database, "0" };
+            new VersionCommand().Process(pars);
+
+            pars = new string[] { "script"};
+            new ScriptCommand().Process(pars);
+
+        }
 
 
  

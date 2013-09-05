@@ -9,10 +9,15 @@ namespace mc.Commands
     public class ScriptCommand : IDatabaseCommand
     {
 
+
         public void Process(string[] args)
         {
-
-            Console.WriteLine(SetupCommand.CommandSyntax);
+            // MigrationFactory.GetMigrationFilePaths(MigrationConfiguration.migrationClassPath);
+            string result = new MigrationCommands().ProcessScriptAllCommand();
+          
+            Console.WriteLine("generated all migration scripts in directory " + MigrationConfiguration.migrationScriptPath);
+            Console.WriteLine("From migration Source files at " + MigrationConfiguration.migrationClassPath);
+     
 
         }
     }

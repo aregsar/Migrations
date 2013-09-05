@@ -18,6 +18,11 @@ namespace mc
         public static string migrationScriptPath { get; set; }
         public static string migrationLibraryAssemblyPath { get; set; }
 
+        public static string ConnectionStringFor(string databaseName)
+        {
+            return MasterConnectionString.Replace("Master", databaseName);
+        }
+
        
         static MigrationConfiguration()
         {

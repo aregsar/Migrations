@@ -74,30 +74,30 @@ namespace Migrations
 
 
 
-        
-        public string Up()
+
+        public string Up(string nextVersion)
         {
             sb.Clear();
             sb.BeginTransaction();
             _Up();
-            sb.CommitTransaction();
+            sb.CommitTransaction("update dbo.SchemaVersion set  VersionTimestamp = '" + nextVersion + "'");
             return sb.GetScript();
         }
 
-        public string Down()
+        public string Down(string prevVersion)
         {
             sb.Clear();
             sb.BeginTransaction();
             _Down();
-            sb.CommitTransaction();
+            sb.CommitTransaction("update dbo.SchemaVersion set  VersionTimestamp = '" + prevVersion + "'");
             return sb.GetScript();
         }
 
 
 
-        public string Up(string scriptFilePath)
+        public string UpScript(string scriptFilePath,string nextVersion)
         {
-            string script = Up();
+            string script = Up(nextVersion);
 
 
             File.WriteAllText(scriptFilePath.Replace(".sql",".change.sql"), script);
@@ -105,9 +105,9 @@ namespace Migrations
             return script;
         }
 
-        public string Down(string scriptFilePath)
+        public string DownScript(string scriptFilePath, string prevVersion)
         {
-            string script = Down();
+            string script = Down(prevVersion);
 
             File.WriteAllText(scriptFilePath.Replace(".sql", ".rollback.sql"), script);
 
@@ -115,21 +115,27 @@ namespace Migrations
         }
 
 
-        public string Up(DatabaseConnection conn)
+        public string Up(DatabaseConnection conn,string nextVersion)
         {
-            string script = Up();
+            string script = Up(nextVersion);
 
             SqlScriptExecuter.ExecuteMigrtionScript(script, conn.ConnectionString,conn.ProviderName,conn.ServerType);
+
+            SqlScriptExecuter.UpdateSchemaVersion(nextVersion, conn.ConnectionString, conn.ProviderName, conn.ServerType);
+
 
             return script;
         }
 
-        public string Down(DatabaseConnection conn)
+        public string Down(DatabaseConnection conn, string prevVersion)
         {
-            string script = Down();
+            string script = Down(prevVersion);
 
             SqlScriptExecuter.ExecuteMigrtionScript(script, conn.ConnectionString, conn.ProviderName, conn.ServerType);
-          
+
+           
+            SqlScriptExecuter.UpdateSchemaVersion(prevVersion, conn.ConnectionString, conn.ProviderName, conn.ServerType);
+           
             return script;
         }
 

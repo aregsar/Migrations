@@ -198,16 +198,16 @@ namespace mc
 
         public string ProcessCreateDatabaseAndSchemaCommand(string databaseName, string connectionString, string masterConnectionString)
         {
-            ProcessCreateDatabaseCommand(databaseName, masterConnectionString);
-            ProcessCreateSchemaCommand(connectionString);
+            string result = ProcessCreateDatabaseCommand(databaseName, masterConnectionString);
+            result = Environment.NewLine + result + ProcessCreateSchemaCommand(connectionString);
             return "command executed";
 
         }
 
-      
 
 
-        private string ProcessCreateDatabaseCommand(string databaseName, string masterConnectionString)
+
+        public string ProcessCreateDatabaseCommand(string databaseName, string masterConnectionString)
         {
             try
             {
@@ -235,7 +235,7 @@ namespace mc
             }
         }
 
-        private string ProcessVersionCommand(string connectionString)
+        public string ProcessVersionCommand(string connectionString)
         {
             try
             {
@@ -248,7 +248,7 @@ namespace mc
         }
 
 
-        private string ProcessCreateMigrationCommand(string migrationName)
+        public string ProcessCreateMigrationCommand(string migrationName)
         {
 
             if (string.IsNullOrEmpty(migrationName.Trim())) return "command is missing migration file name";
@@ -258,9 +258,9 @@ namespace mc
             return "Created a new migration file named " + migrationName.Trim().Replace(" ", "_") + ".cs in directory " + MigrationConfiguration.migrationClassPath;
         }
 
-       
 
-        private string ProcessScriptVerionCommand(string version)
+
+        public string ProcessScriptVerionCommand(string version)
         {
             try
             {
@@ -302,7 +302,7 @@ namespace mc
             }
         }
 
-        private string ProcessScriptAllCommand()
+        public string ProcessScriptAllCommand()
         {
             try
             {
@@ -352,8 +352,8 @@ namespace mc
                         Migration migration = factory.GetMigration(migrationFilePath, MigrationConfiguration.migrationLibraryAssemblyPath);
 
 
-                        script = "Print change script version: " + version + Environment.NewLine + migration.Up();
-                        script = script + Environment.NewLine + "Print rollback script version: " + version + Environment.NewLine + migration.Down() + Environment.NewLine;
+                        script = "Print change script version: " + version + Environment.NewLine + migration.Up(version);
+                        script = script + Environment.NewLine + "Print rollback script version: " + version + Environment.NewLine + migration.Down(version) + Environment.NewLine;
 
                         return script;
                     }
@@ -389,8 +389,8 @@ namespace mc
                     string version = MigrationFactory.GetVersionFromMigrationFilePath(migrationFilePath);
 
 
-                    script = script + "Print change script version: " + version + Environment.NewLine + migration.Up();
-                    script = script + Environment.NewLine + "Print rollback script version: " + version + Environment.NewLine + migration.Down() + Environment.NewLine;
+                    script = script + "Print change script version: " + version + Environment.NewLine + migration.Up(version);
+                    script = script + Environment.NewLine + "Print rollback script version: " + version + Environment.NewLine + migration.Down(version) + Environment.NewLine;
                 }
 
                 return script;
@@ -402,7 +402,7 @@ namespace mc
         }
 
 
-        private string ProcessMigrateUp(string connectionString)
+        public string ProcessMigrateUp(string connectionString)
         {
             try
             {
@@ -412,7 +412,8 @@ namespace mc
 
                 string nextVersion = GetNextVersion(currentVersionFromDatabase, MigrationConfiguration.migrationClassPath);
 
-                if (nextVersion != null)
+                if(!string.IsNullOrEmpty(nextVersion))
+               // if (nextVersion != null)
                 {
                     string migrationFilePath = MigrationFactory.GetMigrationFilePathForVersion(nextVersion, MigrationConfiguration.migrationClassPath);
 
@@ -425,13 +426,13 @@ namespace mc
 
                         string version = MigrationFactory.GetVersionFromMigrationFilePath(migrationFilePath);
 
-                        DatabaseConnection db = new DatabaseConnection(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                        DatabaseConnection db = new DatabaseConnection(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
 
                         string executedMigration = "Executed Migration Version " + version + " Up " + Environment.NewLine;
 
                         try
                         {
-                            script = migration.Up(db);
+                            script = migration.Up(db, nextVersion);
                         }
                         catch (Exception ex)
                         {
@@ -439,25 +440,32 @@ namespace mc
                         }
 
 
-                        try
-                        {
-                            SqlScriptExecuter.UpdateSchemaVersion(nextVersion, MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
-                        }
-                        catch
-                        {
-                            return "Error: changed from current database version " + currentVersionFromDatabase + " but unable to set next version to " + nextVersion;
-                        }
+                        //try
+                        //{
+                        //    SqlScriptExecuter.UpdateSchemaVersion(nextVersion, connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                        //}
+                        //catch
+                        //{
+                        //    return "Error: changed from current database version " + currentVersionFromDatabase + " but unable to set next version to " + nextVersion;
+                        //}
 
                         return executedMigration + script.Replace("begin transaction", "").Replace("commit transaction", "") + Environment.NewLine + "current version is: " + nextVersion;
                     }
                     else
                     {
-                        return "Error: migration file with the specified version does not exist. Command aborted. - current database version is: " + currentVersionFromDatabase;
+                        return "Error: migration file with the specified version does not exist. Command aborted. " + Environment.NewLine + " current database version is: " + currentVersionFromDatabase;
                     }
                 }
                 else
                 {
-                    return "Done: Next version does not exist - current database version is: " + currentVersionFromDatabase;
+                    if (nextVersion == null)
+                    {
+                        return "Done: Next version does not exist " + Environment.NewLine + " current database version is: " + currentVersionFromDatabase;
+                    }
+                    else
+                    {
+                        return "Error: migration file with the specified version does not exist. Command aborted. " + Environment.NewLine + " current database version is: " + currentVersionFromDatabase;
+                    }
                 }
             }
             catch (Exception ex)
@@ -466,7 +474,7 @@ namespace mc
             }     
         }
 
-        private string ProcessMigrateDown(string connectionString)
+        public string ProcessMigrateDown(string connectionString)
         {
             try
             {
@@ -475,48 +483,63 @@ namespace mc
 
                 string currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
 
-                if (currentVersionFromDatabase != "00000000000000")
+                if (currentVersionFromDatabase != "00000000000000" )
                 {
                     string migrationFilePath = MigrationFactory.GetMigrationFilePathForVersion(currentVersionFromDatabase, MigrationConfiguration.migrationClassPath);
 
                     string prevVersion = GetPreviousVersion(currentVersionFromDatabase, MigrationConfiguration.migrationClassPath);
 
-                    if (migrationFilePath != null)
+                    if (string.Empty != prevVersion)
                     {
-                        MigrationFactory factory = MigrationFactory.GetFactoryForDatabaseType(MigrationConfiguration.ServerType);
-
-                        Migration migration = factory.GetMigration(migrationFilePath, MigrationConfiguration.migrationLibraryAssemblyPath);
-
-                        string version = MigrationFactory.GetVersionFromMigrationFilePath(migrationFilePath);
-
-                        DatabaseConnection db = new DatabaseConnection(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
-
-                        string executedMigration = "Executed Migration Version " + version + " Down " + Environment.NewLine;
-
-                        try
+                        if (migrationFilePath != null)
                         {
-                            script = migration.Down(db);
-                        }
-                        catch (Exception ex)
-                        {
-                            return "Error:" + ex.Message;
-                        }
+                            MigrationFactory factory = MigrationFactory.GetFactoryForDatabaseType(MigrationConfiguration.ServerType);
+
+                            Migration migration = factory.GetMigration(migrationFilePath, MigrationConfiguration.migrationLibraryAssemblyPath);
+
+                            string version = MigrationFactory.GetVersionFromMigrationFilePath(migrationFilePath);
+
+                            DatabaseConnection db = new DatabaseConnection(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+
+                            string executedMigration = "Executed Migration Version " + version + " Down " + Environment.NewLine;
+
+                            try
+                            {
+                                script = migration.Down(db, prevVersion);
+                            }
+                            catch (Exception ex)
+                            {
+                                return "Error:" + ex.Message;
+                            }
 
 
-                        try
-                        {
-                            SqlScriptExecuter.UpdateSchemaVersion(prevVersion, MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
-                        }
-                        catch
-                        {
-                            return "Error: rolled back from version " + currentVersionFromDatabase + " but unable to set previous version to " + prevVersion;
-                        }
+                            //try
+                            //{
+                            //    SqlScriptExecuter.UpdateSchemaVersion(prevVersion, connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                            //}
+                            //catch
+                            //{
+                            //    return "Error: rolled back from version " + currentVersionFromDatabase + " but unable to set previous version to " + prevVersion;
+                            //}
 
-                        return executedMigration + script.Replace("begin transaction", "").Replace("commit transaction", "") + Environment.NewLine + "current version is: " + prevVersion;
+                            return executedMigration + script.Replace("begin transaction", "").Replace("commit transaction", "") + Environment.NewLine + "current version is: " + prevVersion;
+                        }
+                        else
+                        {
+                            return "Error: migration file with the specified version does not exist. Command aborted. - current database version is: " + currentVersionFromDatabase;
+                        }
                     }
                     else
                     {
-                        return "Error: migration file with the specified version does not exist. Command aborted. - current database version is: " + currentVersionFromDatabase;
+                        //if (prevVersion == null)
+                        //{
+                        //    return "Done: Prev version does not exist " + Environment.NewLine + " current database version is: " + currentVersionFromDatabase;
+                        //}
+                        //else
+                        //{
+                            return "Error: migration file with the specified version does not exist. Command aborted. " + Environment.NewLine + " current database version is: " + currentVersionFromDatabase;
+                        //}
+
                     }
                 }
                 else
@@ -530,7 +553,7 @@ namespace mc
             }    
         }
 
-        private string ProcessMigrateUpAllCommand(string connectionString)
+        public string ProcessMigrateUpAllCommand(string connectionString)
         {
             string accscript = ProcessMigrateUp(connectionString);
             string script = accscript;
@@ -543,9 +566,9 @@ namespace mc
             return script;
         }
 
-      
 
-        private string ProcessMigrateDownAllCommand(string connectionString)
+
+        public string ProcessMigrateDownAllCommand(string connectionString)
         {
             string accscript = ProcessMigrateDown(connectionString);
             string script = accscript;
@@ -559,18 +582,20 @@ namespace mc
         }
 
 
-        private string ProcessMigrateTo(string connectionString,string version)
+        public string ProcessMigrateTo(string connectionString, string version)
         {
 
             try
             {
+                string currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(connectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+
                 version = version.Trim();
 
                 if (version == "0") version = "00000000000000";
 
                 if (IsVerionTimestamp(version))
                 {
-                    string currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
+                    //string currentVersionFromDatabase = SqlScriptExecuter.GetSchemaVersion(MigrationConfiguration.ConnectionString, MigrationConfiguration.ProviderName, MigrationConfiguration.ServerType);
 
                     if (currentVersionFromDatabase != version)
                     {
@@ -586,12 +611,16 @@ namespace mc
                             {
                                 if (long.Parse(currentVersionFromDatabase) < long.Parse(version))
                                 {
-                                    return ProcessMigrateUpTo(connectionString,currentVersionFromDatabase, version);
+                                    return ProcessMigrateUpTo(connectionString, currentVersionFromDatabase, version);
                                 }
                                 else
                                 {
-                                    return ProcessMigrateDownTo(connectionString,currentVersionFromDatabase, version);
+                                    return ProcessMigrateDownTo(connectionString, currentVersionFromDatabase, version);
                                 }
+                            }
+                            else
+                            {
+                                return "Migration file version " + version + " does not exist" + Environment.NewLine + "Current version is: " + currentVersionFromDatabase;
                             }
                         }
                     }
@@ -600,7 +629,7 @@ namespace mc
                 }
                 else
                 {
-                    return "Incorrect timestamp " + version;
+                    return "Incorrect timestamp format: " + version + Environment.NewLine + "Current version is: " + currentVersionFromDatabase;;
                 }
             }
             catch (Exception ex)
@@ -611,7 +640,7 @@ namespace mc
 
 
 
-        private string ProcessMigrateUpTo(string connectionString, string currentVersionFromDatabase, string version)
+        public string ProcessMigrateUpTo(string connectionString, string currentVersionFromDatabase, string version)
         {
             string accscript = "";
             string script = "";
@@ -650,9 +679,16 @@ namespace mc
 
             string nextversion = null;
 
-            if (index < list.Count - 1)
-                nextversion = list.GetByIndex(index + 1).ToString();
+            if (index == -1)
+            {
+                return string.Empty;
+            }
 
+            if (index < list.Count - 1)
+            {
+                nextversion = list.GetByIndex(index + 1).ToString();
+            }
+           
             return nextversion;
         }
 
@@ -664,8 +700,15 @@ namespace mc
 
             string previousversion = "00000000000000";
 
+            if (index == -1)
+            {
+                return string.Empty;
+            }
+
             if (index > 0)
+            {
                 previousversion = list.GetByIndex(index - 1).ToString();
+            }
 
             return previousversion;
         }

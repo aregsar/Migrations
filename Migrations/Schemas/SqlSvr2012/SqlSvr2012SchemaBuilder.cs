@@ -98,9 +98,16 @@ namespace Migrations.Schemas
             sb.AppendLine("begin transaction ");
         }
 
-        public void CommitTransaction()
+        public void CommitTransaction(string versionUpdate = null)
         {
-            sb.AppendLine("commit transaction ");
+            if (versionUpdate == null)
+            {
+                sb.AppendLine(" commit transaction");
+            }
+            else
+            {
+                sb.AppendLine(" " + versionUpdate + " commit transaction");
+            }
         }
 
 
