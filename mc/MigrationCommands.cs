@@ -281,8 +281,8 @@ namespace mc
                         string[] parts = migrationFilePath.Split('\\');
                         string scriptFilePath = Path.Combine(MigrationConfiguration.migrationScriptPath, parts[parts.Length - 1]).Replace(".cs", ".sql");
 
-                        script = "Generate change script version: " + version + Environment.NewLine + migration.Up(scriptFilePath);
-                        script = script + Environment.NewLine + "Generate rollback script version: " + version + Environment.NewLine + migration.Down(scriptFilePath) + Environment.NewLine;
+                        script = "Generate change script version: " + version + Environment.NewLine + migration.UpScript(scriptFilePath, version);
+                        script = script + Environment.NewLine + "Generate rollback script version: " + version + Environment.NewLine + migration.DownScript(scriptFilePath, version) + Environment.NewLine;
                         script = script + "Generated Script files are located in directory: " + MigrationConfiguration.migrationScriptPath;
                         return script;
                     }
@@ -319,8 +319,8 @@ namespace mc
                     string[] parts = migrationFilePath.Split('\\');
                     string scriptFilePath = Path.Combine(MigrationConfiguration.migrationScriptPath, parts[parts.Length - 1]).Replace(".cs", ".sql");
 
-                    script = script + "Generate change script version: " + version + Environment.NewLine + migration.Up(scriptFilePath);
-                    script = script + Environment.NewLine + "Generate rollback script version: " + version + Environment.NewLine + migration.Down(scriptFilePath) + Environment.NewLine;
+                    script = script + "Generate change script version: " + version + Environment.NewLine + migration.UpScript(scriptFilePath, version);
+                    script = script + Environment.NewLine + "Generate rollback script version: " + version + Environment.NewLine + migration.DownScript(scriptFilePath, version) + Environment.NewLine;
                 }
 
                 script = script + "Generated Script files are located in directory: " + MigrationConfiguration.migrationScriptPath;

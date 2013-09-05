@@ -121,7 +121,7 @@ namespace Migrations
 
             SqlScriptExecuter.ExecuteMigrtionScript(script, conn.ConnectionString,conn.ProviderName,conn.ServerType);
 
-            SqlScriptExecuter.UpdateSchemaVersion(nextVersion, conn.ConnectionString, conn.ProviderName, conn.ServerType);
+            //SqlScriptExecuter.UpdateSchemaVersion(nextVersion, conn.ConnectionString, conn.ProviderName, conn.ServerType);
 
 
             return script;
@@ -134,7 +134,7 @@ namespace Migrations
             SqlScriptExecuter.ExecuteMigrtionScript(script, conn.ConnectionString, conn.ProviderName, conn.ServerType);
 
            
-            SqlScriptExecuter.UpdateSchemaVersion(prevVersion, conn.ConnectionString, conn.ProviderName, conn.ServerType);
+            //SqlScriptExecuter.UpdateSchemaVersion(prevVersion, conn.ConnectionString, conn.ProviderName, conn.ServerType);
            
             return script;
         }
